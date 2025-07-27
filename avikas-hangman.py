@@ -58,7 +58,7 @@ st.markdown("""
         color: #FFF;
         font-family: 'Comic Sans MS', cursive, sans-serif;
     }
-    h1, h2, h3, .stButton > button, .stTextInput > div > div > input {
+    h1, h2, h3, .stTextInput > div > div > input {
         font-size: 32px !important;
     }
     .stButton > button {
@@ -69,10 +69,21 @@ st.markdown("""
         padding: 15px 30px !important;
         width: 100% !important;
         margin-top: 10px;
+        transition: all 0.3s ease-in-out;
     }
-    .stButton > button:has-text("🔊 Hear Word") {
+    .stButton > button:hover {
+        transform: scale(1.05);
+    }
+    .stButton > button:has(span:contains("🔊 Hear Word")) {
         background-color: purple !important;
         font-size: 36px !important;
+        border: 3px solid #ffffff;
+        animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(128, 0, 128, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(128, 0, 128, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(128, 0, 128, 0); }
     }
     .stTextInput > div > div > input {
         font-size: 28px !important;
