@@ -8,7 +8,6 @@ from gtts import gTTS
 from io import BytesIO
 from PIL import Image
 import base64
-from streamlit_autorefresh import st_autorefresh
 
 # Setup folders
 os.makedirs("images", exist_ok=True)
@@ -81,8 +80,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st_autorefresh(interval=1000, limit=0, key="timer")
-
 if 'word_index' not in st.session_state:
     st.session_state.word_index = 0
     st.session_state.correct_count = 0
@@ -91,11 +88,14 @@ if 'word_index' not in st.session_state:
     st.session_state.guessed_letters = []
     st.session_state.wrong_guesses = 0
     st.session_state.timer_start = time.time()
+    st.session_state.timer_last_updated = time.time()
     random.shuffle(WORDS)
     st.session_state.word = WORDS[st.session_state.word_index].upper()
     st.session_state.guessed = ['_' for _ in st.session_state.word]
 
-elapsed = int(time.time() - st.session_state.timer_start)
+# Timer update logic (manual)
+current_time = time.time()
+elapsed = int(current_time - st.session_state.timer_start)
 remaining = max(0, 60 - elapsed)
 st.markdown(f"### ⏱️ Time left: {remaining} seconds")
 if remaining == 0 and '_' in st.session_state.guessed:
