@@ -43,7 +43,7 @@ if 'word_index' not in st.session_state:
     st.session_state.word = WORDS[st.session_state.word_index].upper()
     st.session_state.guessed = ['_' for _ in st.session_state.word]
 
-st.title("🔤 Spelling Game for Kids")
+st.title("🔤 AVIKA's Hangman!! ")
 
 col1, col2 = st.columns([2, 1])
 with col1:
