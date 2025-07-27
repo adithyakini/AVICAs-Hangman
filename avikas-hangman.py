@@ -14,7 +14,7 @@ os.makedirs("images", exist_ok=True)
 os.makedirs("hangman_images", exist_ok=True)
 os.makedirs("sounds", exist_ok=True)
 
-WORDS = ["apple", "banana", "grape", "family", "school", "pencil", "friend", "yellow"]
+WORDS = ["apple", "banana", "grape", "family", "school", "pencil", "friend", "yellow", "favourite", "spend"]
 
 def get_audio_bytes(word):
     tts = gTTS(text=word, lang='en')
