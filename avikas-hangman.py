@@ -6,13 +6,14 @@ import random
 from gtts import gTTS
 from io import BytesIO
 from PIL import Image
+import streamlit.components.v1 as components
 
 # Setup folders
 os.makedirs("images", exist_ok=True)  # For storing word images
 os.makedirs("hangman_images", exist_ok=True)  # For hangman stage images (0.png to 7.png)
 
 # Word list
-WORDS = ["apple", "banana", "grape", "family", "school", "pencil", "friend", "yellow", "favourite", "spend"]
+WORDS = ["apple", "banana", "grape", "family", "school", "pencil", "friend", "yellow"]
 
 # Generate or retrieve audio for a word
 def get_audio_bytes(word):
@@ -43,13 +44,27 @@ if 'word_index' not in st.session_state:
     st.session_state.word = WORDS[st.session_state.word_index].upper()
     st.session_state.guessed = ['_' for _ in st.session_state.word]
 
-st.title("🔤 AVIKA's Hangman!! ")
+st.title("🔤 Spelling Game for Kids")
 
 col1, col2 = st.columns([2, 1])
 with col1:
     st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining**: {len(WORDS) - st.session_state.total_attempted}")
 with col2:
-    if st.button("🔊 Hear Word"):
+    st.markdown("""
+        <style>
+        .big-button button {
+            font-size: 24px !important;
+            height: 60px !important;
+            width: 100% !important;
+        }
+        </style>
+        <div class='big-button'>
+            <form action="/" method="post">
+                <button name="play_audio" type="submit">🔊 Hear Word</button>
+            </form>
+        </div>
+    """, unsafe_allow_html=True)
+    if st.session_state.get("play_audio_clicked") or st.button(" ", key="hidden_audio_btn"):
         audio_bytes = get_audio_bytes(st.session_state.word)
         st.audio(audio_bytes, format='audio/mp3')
 
