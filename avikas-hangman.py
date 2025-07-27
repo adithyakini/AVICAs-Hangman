@@ -44,7 +44,7 @@ if 'word_index' not in st.session_state:
     st.session_state.word = WORDS[st.session_state.word_index].upper()
     st.session_state.guessed = ['_' for _ in st.session_state.word]
 
-st.title("🔤 Spelling Game for Kids")
+st.title("🔤 AVIKA's HANGMAN Game!")
 
 col1, col2 = st.columns([2, 1])
 with col1:
@@ -52,19 +52,14 @@ with col1:
 with col2:
     st.markdown("""
         <style>
-        .big-button button {
+        div.stButton > button {
             font-size: 24px !important;
-            height: 60px !important;
+            padding: 12px 24px;
             width: 100% !important;
         }
         </style>
-        <div class='big-button'>
-            <form action="/" method="post">
-                <button name="play_audio" type="submit">🔊 Hear Word</button>
-            </form>
-        </div>
     """, unsafe_allow_html=True)
-    if st.session_state.get("play_audio_clicked") or st.button(" ", key="hidden_audio_btn"):
+    if st.button("🔊 Hear Word"):
         audio_bytes = get_audio_bytes(st.session_state.word)
         st.audio(audio_bytes, format='audio/mp3')
 
