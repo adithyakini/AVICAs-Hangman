@@ -54,8 +54,8 @@ def play_sound(file):
 st.markdown("""
     <style>
     html, body, .main {
-        background-color: #FFF3E6;
-        color: #000;
+        background-color: #000000;
+        color: #FFF;
         font-family: 'Comic Sans MS', cursive, sans-serif;
     }
     h1, h2, h3, .stButton > button, .stTextInput > div > div > input {
@@ -73,6 +73,7 @@ st.markdown("""
     .stTextInput > div > div > input {
         font-size: 28px !important;
         height: 60px;
+        color: #000 !important;
     }
     .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
         color: #ff5733;
