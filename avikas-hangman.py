@@ -3,15 +3,17 @@
 import streamlit as st
 import os
 import random
+import time
 from gtts import gTTS
 from io import BytesIO
 from PIL import Image
 import base64
-import streamlit.components.v1 as components
+from streamlit_autorefresh import st_autorefresh
 
 # Setup folders
 os.makedirs("images", exist_ok=True)  # For storing word images
 os.makedirs("hangman_images", exist_ok=True)  # For hangman stage images (0.png to 7.png)
+os.makedirs("sounds", exist_ok=True)  # For storing sound effects
 
 # Word list
 WORDS = ["apple", "banana", "grape", "family", "school", "pencil", "friend", "yellow"]
@@ -40,6 +42,20 @@ def show_celebration():
             b64 = base64.b64encode(data).decode()
             md = f"""
             <img src="data:image/gif;base64,{b64}" width="600">
+            """
+            st.markdown(md, unsafe_allow_html=True)
+
+# Play sound effect (autoplay using HTML)
+def play_sound(file):
+    sound_path = f"sounds/{file}"
+    if os.path.exists(sound_path):
+        with open(sound_path, "rb") as f:
+            data = f.read()
+            b64 = base64.b64encode(data).decode()
+            md = f"""
+            <audio autoplay>
+                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+            </audio>
             """
             st.markdown(md, unsafe_allow_html=True)
 
@@ -73,6 +89,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Auto-refresh every second for countdown
+st_autorefresh(interval=1000, limit=0, key="timer")
+
 # Game logic with Streamlit
 if 'word_index' not in st.session_state:
     st.session_state.word_index = 0
@@ -84,94 +103,15 @@ if 'word_index' not in st.session_state:
     st.session_state.wrong_guesses = 0
     st.session_state.show_restart = False
     st.session_state.guess_submitted = False
+    st.session_state.timer_start = time.time()
     random.shuffle(WORDS)
     st.session_state.word = WORDS[st.session_state.word_index].upper()
     st.session_state.guessed = ['_' for _ in st.session_state.word]
 
-st.title("🎉 AVIKA's HANGMAN Game! 🎉")
-
-col1, col2 = st.columns([2, 1])
-with col1:
-    st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining**: {len(WORDS) - st.session_state.total_attempted}")
-with col2:
-    if st.button("🔊 Hear Word"):
-        audio_bytes = get_audio_bytes(st.session_state.word)
-        st.audio(audio_bytes, format='audio/mp3')
-
-# Input box first
-guess = st.text_input("Type a letter:", max_chars=1, key="letter_input")
-submit = st.button("Submit")
-
-# Only process once on submit
-if submit and guess and guess.isalpha():
-    letter = guess.upper()
-    st.session_state.guess_submitted = True
-
-    if letter in st.session_state.word:
-        for i, l in enumerate(st.session_state.word):
-            if l == letter:
-                st.session_state.guessed[i] = letter
-    else:
-        if letter not in st.session_state.guessed_letters:
-            st.session_state.guessed_letters.append(letter)
-            st.session_state.tries -= 1
-            st.session_state.wrong_guesses += 1
-
-# Show hangman image immediately
-show_hangman_image(st.session_state.wrong_guesses)
-
-# Show word image if available
-img_path = f"images/{st.session_state.word.lower()}.png"
-if os.path.exists(img_path):
-    img = Image.open(img_path)
-    st.image(img.resize((200, 200)))
-
-# Display word status
-st.header(' '.join(st.session_state.guessed))
-
-# Show guessed letters
-if st.session_state.guessed_letters:
-    st.markdown("**Wrong guesses**: " + ', '.join(st.session_state.guessed_letters))
-
-# Word completed
-if '_' not in st.session_state.guessed:
-    show_celebration()
-    st.success(f"🎉 Great job! You spelled '{st.session_state.word}' correctly!")
-    st.session_state.correct_count += 1
-    st.session_state.total_attempted += 1
-    if st.button("Next Word"):
-        st.session_state.word_index += 1
-        st.session_state.word = WORDS[st.session_state.word_index].upper()
-        st.session_state.guessed = ['_' for _ in st.session_state.word]
-        st.session_state.guessed_letters = []
-        st.session_state.tries = 7
-        st.session_state.wrong_guesses = 0
-        st.session_state.guess_submitted = False
-
-elif st.session_state.tries == 0:
-    st.error(f"Oops! The word was '{st.session_state.word}'")
-    st.session_state.total_attempted += 1
-    st.markdown(f"**Correct spelling:** {st.session_state.word}")
-    if st.button("Try Next Word"):
-        st.session_state.word_index += 1
-        st.session_state.word = WORDS[st.session_state.word_index].upper()
-        st.session_state.guessed = ['_' for _ in st.session_state.word]
-        st.session_state.guessed_letters = []
-        st.session_state.tries = 7
-        st.session_state.wrong_guesses = 0
-        st.session_state.guess_submitted = False
-
-# Restart game
-if st.session_state.show_restart:
-    if st.button("🔁 Restart Game"):
-        st.session_state.word_index = 0
-        st.session_state.correct_count = 0
-        st.session_state.total_attempted = 0
-        st.session_state.tries = 7
-        st.session_state.guessed_letters = []
-        st.session_state.wrong_guesses = 0
-        st.session_state.show_restart = False
-        st.session_state.guess_submitted = False
-        random.shuffle(WORDS)
-        st.session_state.word = WORDS[0].upper()
-        st.session_state.guessed = ['_' for _ in st.session_state.word]
+# Countdown timer (60 seconds)
+elapsed = int(time.time() - st.session_state.timer_start)
+remaining = max(0, 60 - elapsed)
+st.markdown(f"### ⏱️ Time left: {remaining} seconds")
+if remaining == 0 and '_' in st.session_state.guessed:
+    st.warning("⏰ Time's up!")
+    st.session_state.tries = 0
