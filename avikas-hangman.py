@@ -12,7 +12,7 @@ os.makedirs("images", exist_ok=True)  # For storing word images
 os.makedirs("hangman_images", exist_ok=True)  # For hangman stage images (0.png to 7.png)
 
 # Word list
-WORDS = ["apple", "banana", "grape", "family", "school", "pencil", "friend", "yellow", "favourite", ]
+WORDS = ["apple", "banana", "grape", "family", "school", "pencil", "friend", "yellow", "favourite", "spend"]
 
 # Generate or retrieve audio for a word
 def get_audio_bytes(word):
