@@ -70,6 +70,10 @@ st.markdown("""
         width: 100% !important;
         margin-top: 10px;
     }
+    .stButton > button:has-text("🔊 Hear Word") {
+        background-color: purple !important;
+        font-size: 36px !important;
+    }
     .stTextInput > div > div > input {
         font-size: 28px !important;
         height: 60px;
