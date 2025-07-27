@@ -118,17 +118,17 @@ if submit and guess and guess.isalpha():
             st.session_state.tries -= 1
             st.session_state.wrong_guesses += 1
 
-show_hangman_image(st.session_state.wrong_guesses)
+st.header(' '.join(st.session_state.guessed))
+
+if st.session_state.guessed_letters:
+    st.markdown("**Wrong guesses**: " + ', '.join(st.session_state.guessed_letters))
 
 img_path = f"images/{st.session_state.word.lower()}.png"
 if os.path.exists(img_path):
     img = Image.open(img_path)
     st.image(img.resize((200, 200)))
 
-st.header(' '.join(st.session_state.guessed))
-
-if st.session_state.guessed_letters:
-    st.markdown("**Wrong guesses**: " + ', '.join(st.session_state.guessed_letters))
+show_hangman_image(st.session_state.wrong_guesses)
 
 if '_' not in st.session_state.guessed:
     show_celebration()
