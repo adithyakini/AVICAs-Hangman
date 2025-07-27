@@ -30,10 +30,10 @@ def get_hangman_art(tries_left):
           |      (_)
           |      \|/
           |       |
-          |      / \
+          |      / \\
           |
         __|___
-        """",
+        """,
         """
            _______
           |/      |
@@ -43,7 +43,7 @@ def get_hangman_art(tries_left):
           |      /
           |
         __|___
-        """",
+        """,
         """
            _______
           |/      |
@@ -53,7 +53,7 @@ def get_hangman_art(tries_left):
           |
           |
         __|___
-        """",
+        """,
         """
            _______
           |/      |
@@ -63,7 +63,7 @@ def get_hangman_art(tries_left):
           |
           |
         __|___
-        """",
+        """,
         """
            _______
           |/      |
@@ -73,7 +73,7 @@ def get_hangman_art(tries_left):
           |
           |
         __|___
-        """",
+        """,
         """
            _______
           |/      |
@@ -83,7 +83,7 @@ def get_hangman_art(tries_left):
           |
           |
         __|___
-        """",
+        """,
         """
            _______
           |/      |
@@ -93,8 +93,16 @@ def get_hangman_art(tries_left):
           |
           |
         __|___
-        """",
-        """\n\n\n\n\n\n\n"""
+        """,
+        """
+
+
+
+
+
+
+
+"""
     ]
     return stages[7 - tries_left]
 
