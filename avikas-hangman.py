@@ -114,7 +114,7 @@ if submit and guess and guess.isalpha():
                 st.session_state.guessed[i] = letter
     else:
         if letter not in st.session_state.guessed_letters:
-            play_sound("wrong.mp3")
+            play_sound("wrongguess.mp3")
             st.session_state.guessed_letters.append(letter)
             st.session_state.tries -= 1
             st.session_state.wrong_guesses += 1
@@ -134,7 +134,7 @@ show_hangman_image(st.session_state.wrong_guesses)
 if '_' not in st.session_state.guessed:
     show_celebration()
     play_sound("win.mp3")
-    st.success(f"🎉 Great job! You spelled '{st.session_state.word}' correctly!")
+    st.success(f"🎉 AIYAMMMA! You spelt '{st.session_state.word}' correctly!")
     st.session_state.correct_count += 1
     st.session_state.total_attempted += 1
     if st.button("Next Word"):
