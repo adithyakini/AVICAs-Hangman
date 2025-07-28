@@ -73,7 +73,7 @@ def flying_super_fartman(image_path):
             )
 
 # Display the flying image animation
-flying_super_fartman("path_to_your_uploaded_image.png")
+flying_super_fartman("super_fartman.png")
 
 # Initialize session state
 if 'word_index' not in st.session_state:
