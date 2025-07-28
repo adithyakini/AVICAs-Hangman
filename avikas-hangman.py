@@ -8,7 +8,6 @@ from PIL import Image
 import base64
 
 # Setup folders
-os.makedirs("images", exist_ok=True)
 os.makedirs("fartman_images", exist_ok=True)
 os.makedirs("sounds", exist_ok=True)
 
@@ -83,7 +82,7 @@ if 'word_index' not in st.session_state:
     st.session_state.guessed = ['_' for _ in st.session_state.word]
 
 # Main game UI
-st.title("🎉 Avika's SUPER FARTMAN spelloing Game!")
+st.title("🎉 Avika's SUPER FARTMAN spelling Game!")
 st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining Words**: {len(WORDS) - st.session_state.total_attempted}")
 
 if st.button("🔊 Hear Word"):
