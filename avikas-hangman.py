@@ -1,5 +1,3 @@
-# spelling_game_streamlit.py
-
 import streamlit as st
 import os
 import random
@@ -27,7 +25,7 @@ def show_hangman_image(stage):
     if os.path.exists(image_path):
         st.image(image_path, use_container_width=True)
     else:
-        st.text("[Missing hangman image]")
+        st.text("[Missing Super Fartman image]")
 
 def show_celebration():
     gif_path = "images/confetti.gif"
@@ -51,65 +49,33 @@ def play_sound(file):
             """
             st.markdown(md, unsafe_allow_html=True)
 
-st.markdown("""
-    <style>
-    html, body, .main {
-        background-color: #000000;
-        color: #FFF;
-        font-family: 'Comic Sans MS', cursive, sans-serif;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-    }
-    h1, h2, h3, .stTextInput > div > div > input {
-        font-size: 5vw !important;
-    }
-    .stButton > button {
-        background-color: #FFB347 !important;
-        color: white !important;
-        font-size: 5vw !important;
-        border-radius: 15px !important;
-        padding: 10px 20px !important;
-        width: 100% !important;
-        margin-top: 10px;
-        transition: all 0.3s ease-in-out;
-    }
-    .stButton > button:hover {
-        transform: scale(1.05);
-    }
-    .stButton > button:has(span:contains("🔊 Hear Word")) {
-        background-color: purple !important;
-        font-size: 6vw !important;
-        border: 3px solid #ffffff;
-        animation: pulse 1s infinite;
-    }
-    @keyframes pulse {
-        0% { box-shadow: 0 0 0 0 rgba(128, 0, 128, 0.7); }
-        70% { box-shadow: 0 0 0 10px rgba(128, 0, 128, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(128, 0, 128, 0); }
-    }
-    .stTextInput > div > div > input {
-        font-size: 6vw !important;
-        height: 60px;
-        color: #000 !important;
-    }
-    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-        color: #ff5733;
-    }
-    @media (min-width: 768px) {
-        h1, h2, h3, .stTextInput > div > div > input {
-            font-size: 32px !important;
-        }
-        .stButton > button {
-            font-size: 28px !important;
-        }
-        .stButton > button:has(span:contains("🔊 Hear Word")) {
-            font-size: 36px !important;
-        }
-    }
-    </style>
-""", unsafe_allow_html=True)
+# Define the flying image animation
+def flying_super_fartman(image_path):
+    if os.path.exists(image_path):
+        with open(image_path, "rb") as f:
+            data = f.read()
+            b64 = base64.b64encode(data).decode()
+            st.markdown(
+                f"""
+                <div style="position: relative; height: 150px;">
+                    <img src="data:image/png;base64,{b64}" 
+                         style="position: absolute; animation: fly 5s linear infinite;">
+                </div>
+                <style>
+                    @keyframes fly {{
+                        0% {{ left: -150px; }}
+                        100% {{ left: 100%; }}
+                    }}
+                    img {{ position: absolute; left: 0; top: 50px; height: 100px; }}
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
 
+# Display the flying image animation
+flying_super_fartman("path_to_your_uploaded_image.png")
+
+# Initialize session state
 if 'word_index' not in st.session_state:
     st.session_state.word_index = 0
     st.session_state.correct_count = 0
@@ -122,9 +88,9 @@ if 'word_index' not in st.session_state:
     st.session_state.word = WORDS[st.session_state.word_index].upper()
     st.session_state.guessed = ['_' for _ in st.session_state.word]
 
-st.title("🎉 AVIKA's HANGMAN Game! 🎉")
-
-st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining**: {len(WORDS) - st.session_state.total_attempted}")
+# Main game UI
+st.title("🎉 SUPER FARTMAN Game! 🎉")
+st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining Words**: {len(WORDS) - st.session_state.total_attempted}")
 
 if st.button("🔊 Hear Word"):
     audio_bytes = get_audio_bytes(st.session_state.word)
