@@ -63,8 +63,8 @@ def flying_super_fartman(image_path):
                 </div>
                 <style>
                     @keyframes fly-once {{
-                        0% {{ left: -300px; }}
-                        100% {{ left: 100%; }}
+                        0% {{ right: -300px; }}
+                        100% {{ right: 100%; }}
                     }}
                     img {{
                         position: absolute; 
