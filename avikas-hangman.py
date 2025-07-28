@@ -110,4 +110,82 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# (rest of the code remains unchanged)
+if 'word_index' not in st.session_state:
+    st.session_state.word_index = 0
+    st.session_state.correct_count = 0
+    st.session_state.total_attempted = 0
+    st.session_state.tries = 7
+    st.session_state.guessed_letters = []
+    st.session_state.wrong_guesses = 0
+    st.session_state.guess_input = ""
+    random.shuffle(WORDS)
+    st.session_state.word = WORDS[st.session_state.word_index].upper()
+    st.session_state.guessed = ['_' for _ in st.session_state.word]
+
+st.title("🎉 AVIKA's HANGMAN Game! 🎉")
+
+st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining**: {len(WORDS) - st.session_state.total_attempted}")
+
+if st.button("🔊 Hear Word"):
+    audio_bytes = get_audio_bytes(st.session_state.word)
+    st.audio(audio_bytes, format='audio/mp3')
+
+with st.form(key="letter_form"):
+    guess = st.text_input("Type a letter:", max_chars=1, value=st.session_state.guess_input, key="guess_box")
+    submit = st.form_submit_button("Submit")
+
+if submit and guess and guess.isalpha():
+    letter = guess.upper()
+    st.session_state.guess_input = ""
+    if letter in st.session_state.word:
+        play_sound("correct.mp3")
+        for i, l in enumerate(st.session_state.word):
+            if l == letter:
+                st.session_state.guessed[i] = letter
+    else:
+        if letter not in st.session_state.guessed_letters:
+            play_sound("wrong.mp3")
+            st.session_state.guessed_letters.append(letter)
+            st.session_state.tries -= 1
+            st.session_state.wrong_guesses += 1
+
+st.header(' '.join(st.session_state.guessed))
+
+if st.session_state.guessed_letters:
+    st.markdown("**Wrong guesses**: " + ', '.join(st.session_state.guessed_letters))
+
+img_path = f"images/{st.session_state.word.lower()}.png"
+if os.path.exists(img_path):
+    img = Image.open(img_path)
+    st.image(img.resize((200, 200)))
+
+show_hangman_image(st.session_state.wrong_guesses)
+
+if '_' not in st.session_state.guessed:
+    show_celebration()
+    play_sound("win.mp3")
+    st.success(f"🎉 Great job! You spelled '{st.session_state.word}' correctly!")
+    st.session_state.correct_count += 1
+    st.session_state.total_attempted += 1
+    if st.button("Next Word"):
+        st.session_state.word_index += 1
+        st.session_state.word = WORDS[st.session_state.word_index % len(WORDS)].upper()
+        st.session_state.guessed = ['_' for _ in st.session_state.word]
+        st.session_state.guessed_letters = []
+        st.session_state.tries = 7
+        st.session_state.wrong_guesses = 0
+        st.session_state.guess_input = ""
+
+elif st.session_state.tries == 0:
+    play_sound("lose.mp3")
+    st.error(f"Oops! The word was '{st.session_state.word}'")
+    st.session_state.total_attempted += 1
+    st.markdown(f"**Correct spelling:** {st.session_state.word}")
+    if st.button("Try Next Word"):
+        st.session_state.word_index += 1
+        st.session_state.word = WORDS[st.session_state.word_index % len(WORDS)].upper()
+        st.session_state.guessed = ['_' for _ in st.session_state.word]
+        st.session_state.guessed_letters = []
+        st.session_state.tries = 7
+        st.session_state.wrong_guesses = 0
+        st.session_state.guess_input = ""
