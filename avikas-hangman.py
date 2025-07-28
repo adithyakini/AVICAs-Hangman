@@ -73,7 +73,7 @@ if 'word_index' not in st.session_state:
     st.session_state.word_index = 0
     st.session_state.correct_count = 0
     st.session_state.total_attempted = 0
-    st.session_state.tries = 7
+    st.session_state.tries = 3
     st.session_state.guessed_letters = []
     st.session_state.wrong_guesses = 0
     st.session_state.guess_input = ""
@@ -113,7 +113,7 @@ st.header(' '.join(st.session_state.guessed))
 if st.session_state.guessed_letters:
     st.markdown("**Wrong guesses**: " + ', '.join(st.session_state.guessed_letters))
 
-img_path = f"images/{st.session_state.word.lower()}.png"
+img_path = f"fartman_images/{st.session_state.word.lower()}.png"
 if os.path.exists(img_path):
     img = Image.open(img_path)
     st.image(img.resize((200, 200)))
@@ -130,7 +130,7 @@ if '_' not in st.session_state.guessed:
         st.session_state.word = WORDS[st.session_state.word_index % len(WORDS)].upper()
         st.session_state.guessed = ['_' for _ in st.session_state.word]
         st.session_state.guessed_letters = []
-        st.session_state.tries = 7
+        st.session_state.tries = 3
         st.session_state.wrong_guesses = 0
         st.session_state.guess_input = ""
 
@@ -144,6 +144,6 @@ elif st.session_state.tries == 0:
         st.session_state.word = WORDS[st.session_state.word_index % len(WORDS)].upper()
         st.session_state.guessed = ['_' for _ in st.session_state.word]
         st.session_state.guessed_letters = []
-        st.session_state.tries = 7
+        st.session_state.tries = 3
         st.session_state.wrong_guesses = 0
         st.session_state.guess_input = ""
