@@ -14,7 +14,7 @@ os.makedirs("images", exist_ok=True)
 os.makedirs("hangman_images", exist_ok=True)
 os.makedirs("sounds", exist_ok=True)
 
-WORDS = ["ugly", "beautiful", "knife", "terrace", "school", "bright", "chase", "colourful", "favourite", "spend"]
+WORDS = ["apple", "banana", "grape", "family", "school", "pencil", "friend", "yellow", "favourite", "spend"]
 
 def get_audio_bytes(word):
     tts = gTTS(text=word, lang='en')
@@ -25,7 +25,7 @@ def get_audio_bytes(word):
 def show_hangman_image(stage):
     image_path = f"hangman_images/{stage}.png"
     if os.path.exists(image_path):
-        st.image(image_path, width=300)
+        st.image(image_path, use_column_width=True)
     else:
         st.text("[Missing hangman image]")
 
@@ -35,7 +35,7 @@ def show_celebration():
         with open(gif_path, "rb") as f:
             data = f.read()
             b64 = base64.b64encode(data).decode()
-            md = f"<img src='data:image/gif;base64,{b64}' width='600'>"
+            md = f"<img src='data:image/gif;base64,{b64}' style='width: 100%;'>"
             st.markdown(md, unsafe_allow_html=True)
 
 def play_sound(file):
@@ -57,16 +57,19 @@ st.markdown("""
         background-color: #000000;
         color: #FFF;
         font-family: 'Comic Sans MS', cursive, sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
     }
     h1, h2, h3, .stTextInput > div > div > input {
-        font-size: 32px !important;
+        font-size: 6vw !important;
     }
     .stButton > button {
         background-color: #FFB347 !important;
         color: white !important;
-        font-size: 28px !important;
+        font-size: 6vw !important;
         border-radius: 15px !important;
-        padding: 15px 30px !important;
+        padding: 10px 20px !important;
         width: 100% !important;
         margin-top: 10px;
         transition: all 0.3s ease-in-out;
@@ -76,7 +79,7 @@ st.markdown("""
     }
     .stButton > button:has(span:contains("🔊 Hear Word")) {
         background-color: purple !important;
-        font-size: 36px !important;
+        font-size: 7vw !important;
         border: 3px solid #ffffff;
         animation: pulse 1s infinite;
     }
@@ -86,7 +89,7 @@ st.markdown("""
         100% { box-shadow: 0 0 0 0 rgba(128, 0, 128, 0); }
     }
     .stTextInput > div > div > input {
-        font-size: 28px !important;
+        font-size: 6vw !important;
         height: 60px;
         color: #000 !important;
     }
@@ -110,13 +113,11 @@ if 'word_index' not in st.session_state:
 
 st.title("🎉 AVIKA's HANGMAN Game! 🎉")
 
-col1, col2 = st.columns([2, 1])
-with col1:
-    st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining**: {len(WORDS) - st.session_state.total_attempted}")
-with col2:
-    if st.button("🔊 Hear Word"):
-        audio_bytes = get_audio_bytes(st.session_state.word)
-        st.audio(audio_bytes, format='audio/mp3')
+st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining**: {len(WORDS) - st.session_state.total_attempted}")
+
+if st.button("🔊 Hear Word"):
+    audio_bytes = get_audio_bytes(st.session_state.word)
+    st.audio(audio_bytes, format='audio/mp3')
 
 with st.form(key="letter_form"):
     guess = st.text_input("Type a letter:", max_chars=1, value=st.session_state.guess_input, key="guess_box")
