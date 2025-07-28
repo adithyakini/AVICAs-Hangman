@@ -9,7 +9,7 @@ import base64
 
 # Setup folders
 os.makedirs("images", exist_ok=True)
-os.makedirs("hangman_images", exist_ok=True)
+os.makedirs("fartman_images", exist_ok=True)
 os.makedirs("sounds", exist_ok=True)
 
 WORDS = ["apple", "banana", "grape", "family", "school", "pencil", "friend", "yellow", "favourite", "spend"]
@@ -21,21 +21,11 @@ def get_audio_bytes(word):
     return fp.getvalue()
 
 def show_hangman_image(stage):
-    image_path = f"hangman_images/{stage}.png"
+    image_path = f"fartman_images/{stage}.png"
     if os.path.exists(image_path):
         st.image(image_path, use_container_width=True)
     else:
         st.text("[Missing Super Fartman image]")
-
-def show_celebration():
-    gif_path = "images/confetti.gif"
-    if os.path.exists(gif_path):
-        with open(gif_path, "rb") as f:
-            data = f.read()
-            b64 = base64.b64encode(data).decode()
-            md = f"<img src='data:image/gif;base64,{b64}' style='width: 100%;'>"
-            st.markdown(md, unsafe_allow_html=True)
-
 def play_sound(file):
     sound_path = f"sounds/{file}"
     if os.path.exists(sound_path):
@@ -49,7 +39,7 @@ def play_sound(file):
             """
             st.markdown(md, unsafe_allow_html=True)
 
-# Define the flying image animation (scrolls left to right, only once, and larger)
+# Define the flying image animation (scrolls right to left, only once, and larger)
 def flying_super_fartman(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as f:
@@ -93,7 +83,7 @@ if 'word_index' not in st.session_state:
     st.session_state.guessed = ['_' for _ in st.session_state.word]
 
 # Main game UI
-st.title("🎉 Avika's SUPER FARTMAN Game! 🎉")
+st.title("🎉 Avika's SUPER FARTMAN spelloing Game!")
 st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining Words**: {len(WORDS) - st.session_state.total_attempted}")
 
 if st.button("🔊 Hear Word"):
@@ -132,7 +122,6 @@ if os.path.exists(img_path):
 show_hangman_image(st.session_state.wrong_guesses)
 
 if '_' not in st.session_state.guessed:
-    show_celebration()
     play_sound("win.mp3")
     st.success(f"🎉 AIYAMMMA! You spelt '{st.session_state.word}' correctly!")
     st.session_state.correct_count += 1
