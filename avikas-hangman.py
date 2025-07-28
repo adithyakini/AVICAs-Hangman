@@ -49,7 +49,7 @@ def play_sound(file):
             """
             st.markdown(md, unsafe_allow_html=True)
 
-# Define the flying image animation
+# Define the flying image animation (scrolls left to right, only once, and larger)
 def flying_super_fartman(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as f:
@@ -57,22 +57,26 @@ def flying_super_fartman(image_path):
             b64 = base64.b64encode(data).decode()
             st.markdown(
                 f"""
-                <div style="position: relative; height: 150px;">
+                <div style="position: relative; width: 100%; height: 300px; overflow: hidden;">
                     <img src="data:image/png;base64,{b64}" 
-                         style="position: absolute; animation: fly 5s linear infinite;">
+                         style="position: absolute; animation: fly-once 5s linear;">
                 </div>
                 <style>
-                    @keyframes fly {{
-                        0% {{ left: -150px; }}
+                    @keyframes fly-once {{
+                        0% {{ left: -300px; }}
                         100% {{ left: 100%; }}
                     }}
-                    img {{ position: absolute; left: 0; top: 50px; height: 100px; }}
+                    img {{
+                        position: absolute; 
+                        top: 50px; 
+                        height: 200px; /* Adjust height for a larger image */
+                    }}
                 </style>
                 """,
                 unsafe_allow_html=True,
             )
 
-# Display the flying image animation
+# Call the function to display the flying image
 flying_super_fartman("super_fartman.png")
 
 # Initialize session state
