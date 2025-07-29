@@ -55,31 +55,43 @@ def play_sound(file):
             st.markdown(md, unsafe_allow_html=True)
 
 def flying_super_fartman(image_path):
+    import base64
+    import os
     if os.path.exists(image_path):
         with open(image_path, "rb") as f:
             data = f.read()
             b64 = base64.b64encode(data).decode()
             st.markdown(
                 f"""
-                <div style="position: relative; width: 100%; height: 200px; overflow: hidden;">
-                    <img src="data:image/png;base64,{b64}" 
-                         style="position: absolute; animation: fly-once 4s linear;">
-                </div>
                 <style>
-                    @keyframes fly-once {{
-                        0% {{ left: 100%; }}
-                        100% {{ left: -100px; }}
-                    }}
-                    div > img {{
-                        position: absolute; 
-                        top: 40px; 
-                        height: 120px;
-                    }}
+                .flying-fartman-overlay {{
+                    position: fixed;
+                    top: 40px;
+                    right: 0;
+                    width: 300px;
+                    height: 140px;
+                    pointer-events: none;
+                    z-index: 9999;
+                }}
+                .flying-fartman-overlay img {{
+                    position: absolute;
+                    top: 0;
+                    left: 100%;
+                    height: 120px;
+                    animation: fly-once 3s linear;
+                }}
+                @keyframes fly-once {{
+                    0% {{ left: 100%; }}
+                    100% {{ left: -300px; }}
+                }}
                 </style>
+                <div class="flying-fartman-overlay">
+                    <img src="data:image/png;base64,{b64}">
+                </div>
                 """,
                 unsafe_allow_html=True,
             )
-
+            
 def reset_word():
     st.session_state.word = WORDS[st.session_state.word_index % len(WORDS)].upper()
     st.session_state.guessed = ['_' for _ in st.session_state.word]
