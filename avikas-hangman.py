@@ -22,7 +22,7 @@ def get_audio_bytes(word):
     tts.write_to_fp(fp)
     return fp.getvalue()
 
-def show_fartman_image(tries, width=520):
+def show_fartman_image(tries, width=320):
     hangman_images = {
         3: "fartman_images/fartman_full.png",
         2: "fartman_images/fartman_2.png",
@@ -68,7 +68,7 @@ def flying_super_fartman(image_path):
                 <style>
                     @keyframes fly-once {{
                         0% {{ left: 100%; }}
-                        100% {{ left: -300px; }}
+                        100% {{ left: -100px; }}
                     }}
                     div > img {{
                         position: absolute; 
