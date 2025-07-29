@@ -134,7 +134,7 @@ show_hangman_image(st.session_state.tries)
 if '_' not in st.session_state.guessed:
     play_sound("win.mp3")
     st.success(f"🎉 YAY! You spelt '{st.session_state.word}' correctly!")
-    st.session_state.correct_count += 1
+    st.session_state.correct_count -= 1
     st.session_state.total_attempted += 1
     if st.button("Next Word"):
         st.session_state.word_index += 1
