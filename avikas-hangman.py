@@ -113,12 +113,12 @@ if submit and guess and guess.isalpha():
             if l == letter:
                 st.session_state.guessed[i] = letter
     else:
-        if letter not in st.session_state.guessed_letters:
-            play_sound("wrongguess.mp3")
+        if letter not in st.session_state.guessed_letters:  # Ensure it's a new wrong guess
             st.session_state.guessed_letters.append(letter)
             st.session_state.tries -= 1
             st.session_state.wrong_guesses += 1
-
+            play_sound("wrongguess.mp3")  # Play fart sound here
+            
 st.header(' '.join(st.session_state.guessed))
 
 if st.session_state.guessed_letters:
