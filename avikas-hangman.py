@@ -156,4 +156,4 @@ elif st.session_state.tries == 0:
         st.session_state.wrong_guesses = 0
         st.session_state.guess_input = ""
 #DEBUG
-st.write("Available images:", os.listdir("fartman_images"))
+#st.write("Available images:", os.listdir("fartman_images"))
