@@ -5,6 +5,7 @@ from gtts import gTTS
 from io import BytesIO
 from PIL import Image
 import base64
+import uuid
 
 # Setup folders
 os.makedirs("fartman_images", exist_ok=True)
@@ -40,13 +41,7 @@ def play_sound(file):
     if os.path.exists(sound_path):
         with open(sound_path, "rb") as f:
             data = f.read()
-            b64 = base64.b64encode(data).decode()
-            md = f"""
-            <audio autoplay>
-                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-            </audio>
-            """
-            st.markdown(md, unsafe_allow_html=True)
+            st.audio(data, format="audio/mp3", start_time=0, key=str(uuid.uuid4()))
 
 def flying_super_fartman(image_path):
     if os.path.exists(image_path):
