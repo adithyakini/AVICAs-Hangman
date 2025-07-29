@@ -22,7 +22,7 @@ def get_audio_bytes(word):
     tts.write_to_fp(fp)
     return fp.getvalue()
 
-def show_fartman_image(tries, width=300):
+def show_fartman_image(tries, width=200):
     hangman_images = {
         3: "fartman_images/fartman_full.png",
         2: "fartman_images/fartman_2.png",
@@ -38,7 +38,7 @@ def show_fartman_image(tries, width=300):
         st.image(image_path, width=width, use_container_width=True)
     else:
         st.markdown(
-            f"<div style='height:500px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;font-size:1.4em;'>[fartman image missing]</div>", 
+            f"<div style='height:200px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;font-size:1.4em;'>[fartman image missing]</div>", 
             unsafe_allow_html=True
         )
 def play_sound(file):
