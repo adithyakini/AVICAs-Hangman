@@ -6,7 +6,6 @@ from io import BytesIO
 from PIL import Image
 import base64
 import uuid
-from PIL import Image
 
 # Setup folders
 os.makedirs("fartman_images", exist_ok=True)
