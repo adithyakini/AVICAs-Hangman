@@ -118,7 +118,7 @@ if submit and guess and guess.isalpha():
             st.session_state.tries -= 1
             st.session_state.wrong_guesses += 1
             play_sound("wrongguess.mp3")  # Play fart sound here
-            
+
 st.header(' '.join(st.session_state.guessed))
 
 if st.session_state.guessed_letters:
@@ -155,15 +155,7 @@ elif st.session_state.tries == 0:  # Out of tries
     if not st.session_state.get('word_skipped', False):  # Prevent double increment
         st.session_state.total_attempted += 1
         st.session_state.word_skipped = True  # Mark this word as skipped
-    if st.button("Try Next Word"):
-        st.session_state.word_index += 1
-        st.session_state.word = WORDS[st.session_state.word_index % len(WORDS)].upper()
-        st.session_state.guessed = ['_' for _ in st.session_state.word]
-        st.session_state.guessed_letters = []
-        st.session_state.tries = 3
-        st.session_state.wrong_guesses = 0
-        st.session_state.guess_input = ""
-        st.session_state.word_skipped = False  # Reset for the next word
+    
 progress = st.session_state.total_attempted / len(WORDS)
 st.progress(progress)
 
