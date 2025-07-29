@@ -187,8 +187,7 @@ with col1:
             "guessed": st.session_state.guessed,
             "guessed_letters": st.session_state.guessed_letters,
         })
-    img = Image.open("hangman_images_BKP/1.png")
-    img.show()
+
 with col2:
     st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
     st.markdown("<h2 style='text-align:center;'>Fartman Status</h2>", unsafe_allow_html=True)
@@ -199,3 +198,7 @@ with col2:
         st.markdown("<div style='margin-top: 16px;'></div>", unsafe_allow_html=True)
         img = Image.open(img_path)
         st.image(img.resize((200, 200)), caption=f"Hint for word", use_container_width=False)
+
+img = Image.open("hangman_images_BKP/1.png")
+img.show()
+    
