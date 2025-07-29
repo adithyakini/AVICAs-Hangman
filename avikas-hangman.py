@@ -186,10 +186,10 @@ with col1:
             "word_skipped": st.session_state.word_skipped,
             "guessed": st.session_state.guessed,
             "guessed_letters": st.session_state.guessed_letters,
-            
-            img = Image.open("fartman_images/fartman_full.png")
-            img.show()
         })
+
+img = Image.open("fartman_images/fartman_full.png")
+img.show()
 
 with col2:
     st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
