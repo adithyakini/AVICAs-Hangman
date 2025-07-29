@@ -198,7 +198,4 @@ with col2:
         st.markdown("<div style='margin-top: 16px;'></div>", unsafe_allow_html=True)
         img = Image.open(img_path)
         st.image(img.resize((200, 200)), caption=f"Hint for word", use_container_width=False)
-
-img = Image.open("super_fartman.png")
-img.show()
     
