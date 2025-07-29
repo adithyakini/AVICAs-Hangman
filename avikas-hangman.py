@@ -19,7 +19,7 @@ def get_audio_bytes(word):
     tts.write_to_fp(fp)
     return fp.getvalue()
 
-def show_hangman_image(stage):
+def show_fartman_image(stage):
     image_path = f"fartman_images/{stage}.png"
     if os.path.exists(image_path):
         st.image(image_path, use_container_width=True)
