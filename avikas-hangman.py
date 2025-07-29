@@ -19,7 +19,7 @@ def get_audio_bytes(word):
     tts.write_to_fp(fp)
     return fp.getvalue()
 
-def show_hangman_image(tries):
+def show_fartman_image(tries):
     # Map tries to corresponding hangman stage images
     hangman_images = {
         3: "fartman_images/fartman_full.png",  # Full health
@@ -129,7 +129,7 @@ if os.path.exists(img_path):
     img = Image.open(img_path)
     st.image(img.resize((200, 200)))
 
-show_hangman_image(st.session_state.tries)
+show_fartman_image(st.session_state.tries)
 
 if '_' not in st.session_state.guessed:
     play_sound("win.mp3")
