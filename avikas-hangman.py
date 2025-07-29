@@ -69,7 +69,7 @@ def flying_super_fartman(image_path):
                     top: 40px;
                     right: 0;
                     width: 300px;
-                    height: 140px;
+                    height: 240px;
                     pointer-events: none;
                     z-index: 9999;
                 }}
