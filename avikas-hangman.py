@@ -139,7 +139,6 @@ if '_' not in st.session_state.guessed:  # Word guessed correctly
         st.session_state.correct_count += 1
         st.session_state.total_attempted += 1
         st.session_state.word_guessed = True  # Mark this word as completed
-    
 
 elif st.session_state.tries == 0:  # Out of tries
     play_sound("lose.mp3")
@@ -147,15 +146,16 @@ elif st.session_state.tries == 0:  # Out of tries
     if not st.session_state.get('word_skipped', False):  # Prevent double increment
         st.session_state.total_attempted += 1
         st.session_state.word_skipped = True  # Mark this word as skipped
-    if st.button("Try Next Word"):
-        st.session_state.word_index += 1
-        st.session_state.word = WORDS[st.session_state.word_index % len(WORDS)].upper()
-        st.session_state.guessed = ['_' for _ in st.session_state.word]
-        st.session_state.guessed_letters = []
-        st.session_state.tries = 3
-        st.session_state.wrong_guesses = 0
-        st.session_state.guess_input = ""
-        st.session_state.word_skipped = False  # Reset for the next word
+if st.button("Next Word"):
+    st.session_state.word_index += 1
+    st.session_state.word = WORDS[st.session_state.word_index % len(WORDS)].upper()
+    st.session_state.guessed = ['_' for _ in st.session_state.word]
+    st.session_state.guessed_letters = []
+    st.session_state.tries = 3
+    st.session_state.wrong_guesses = 0
+    st.session_state.guess_input = ""
+    st.session_state.word_skipped = False  # Reset for the next word
+
 progress = st.session_state.total_attempted / len(WORDS)
 st.progress(progress)
 
