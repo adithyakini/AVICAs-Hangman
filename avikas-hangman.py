@@ -199,6 +199,6 @@ with col2:
         img = Image.open(img_path)
         st.image(img.resize((200, 200)), caption=f"Hint for word", use_container_width=False)
 
-img = Image.open("hangman_images_BKP/1.png")
+img = Image.open("super_fartman.png")
 img.show()
     
