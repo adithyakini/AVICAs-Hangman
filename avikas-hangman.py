@@ -153,7 +153,9 @@ with col1:
 
     if st.session_state.guessed_letters:
         st.markdown("**Wrong guesses**: " + ', '.join(st.session_state.guessed_letters))
-
+    # Check if current word is finished
+    word_finished = ('_' not in st.session_state.guessed) or (st.session_state.tries == 0)
+    
     # --- Win/Lose Logic ---
     if '_' not in st.session_state.guessed:
         play_sound("win.mp3")
@@ -179,11 +181,12 @@ with col1:
             random.shuffle(WORDS)
             reset_word()
     else:
-        if st.button("Next Word"):
-            st.session_state.word_index += 1
-            if st.session_state.word_index % len(WORDS) == 0:
-                random.shuffle(WORDS)
-            reset_word()
+        if word_finished:
+            if st.button("Next Word"):
+                st.session_state.word_index += 1
+                if st.session_state.word_index % len(WORDS) == 0:
+                    random.shuffle(WORDS)
+                reset_word()
 
     progress = st.session_state.total_attempted / len(WORDS)
     st.progress(progress)
