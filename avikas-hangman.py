@@ -31,9 +31,9 @@ def show_fartman_image(tries, width=320):
     }
     image_path = hangman_images.get(tries)
     abs_path = os.path.abspath(image_path) if image_path else None
-    st.write(f"DEBUG: Image path for tries={tries}: {image_path}")
-    st.write(f"DEBUG: Absolute path: {abs_path}")
-    st.write(f"DEBUG: os.path.exists: {os.path.exists(image_path)}")
+    #st.write(f"DEBUG: Image path for tries={tries}: {image_path}")
+    #st.write(f"DEBUG: Absolute path: {abs_path}")
+    #st.write(f"DEBUG: os.path.exists: {os.path.exists(image_path)}")
     if image_path and os.path.exists(image_path):
         st.image(image_path, width=width, use_container_width=False)
     else:
@@ -91,7 +91,7 @@ def flying_super_fartman(image_path):
                 """,
                 unsafe_allow_html=True,
             )
-            
+
 def reset_word():
     st.session_state.word = WORDS[st.session_state.word_index % len(WORDS)].upper()
     st.session_state.guessed = ['_' for _ in st.session_state.word]
