@@ -41,15 +41,7 @@ def play_sound(file):
     if os.path.exists(sound_path):
         with open(sound_path, "rb") as f:
             data = f.read()
-            b64 = base64.b64encode(data).decode()
-            unique_id = uuid.uuid4()
-            st.markdown(
-                f"""
-                <audio autoplay>
-                    <source src="data:audio/mp3;base64,{b64}?v={unique_id}" type="audio/mp3">
-                </audio>
-                """, unsafe_allow_html=True
-            )
+            st.audio(data, format="audio/mp3")
 
 def flying_super_fartman(image_path):
     if os.path.exists(image_path):
