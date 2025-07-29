@@ -30,12 +30,17 @@ def show_fartman_image(tries, width=320):
         0: "fartman_images/fartman_0.png"
     }
     image_path = hangman_images.get(tries)
-    st.write(f"DEBUG: Image path for tries={tries}: {image_path}")  # <-- Add this for debugging
+    abs_path = os.path.abspath(image_path) if image_path else None
+    st.write(f"DEBUG: Image path for tries={tries}: {image_path}")
+    st.write(f"DEBUG: Absolute path: {abs_path}")
+    st.write(f"DEBUG: os.path.exists: {os.path.exists(image_path)}")
     if image_path and os.path.exists(image_path):
         st.image(image_path, width=width, use_container_width=False)
     else:
-        st.markdown(f"<div style='height:320px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;font-size:1.4em;'>[fartman image missing]</div>", unsafe_allow_html=True)
-
+        st.markdown(
+            f"<div style='height:320px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;font-size:1.4em;'>[fartman image missing]</div>", 
+            unsafe_allow_html=True
+        )
 def play_sound(file):
     sound_path = f"sounds/{file}"
     if os.path.exists(sound_path):
