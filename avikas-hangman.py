@@ -200,7 +200,7 @@ with col1:
         })
 
 with col2:
-    st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 40px;'></div>", unsafe_allow_html=True)
     #st.markdown("<h3 style='text-align:center;'>Fartman Status</h3>", unsafe_allow_html=True)
     show_fartman_image(st.session_state.tries, width=300)
     # Show the word's image (if available)
