@@ -25,7 +25,7 @@ def show_hangman_image(tries):
         3: "fartman_images/fartman_full.png",  # Full health
         2: "fartman_images/fartman_2.png",    # 2 tries left
         1: "fartman_images/fartman_1.png",    # 1 try left
-        0: "fartman_images/fartman_lost.png"  # Game over
+        0: "fartman_images/fartman_0.png"  # Game over
     }
     image_path = hangman_images.get(tries)
     if image_path and os.path.exists(image_path):
