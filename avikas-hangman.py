@@ -22,7 +22,6 @@ def get_audio_bytes(word):
     return fp.getvalue()
 
 def show_fartman_image(tries, width=320):
-    # Map tries to corresponding hangman stage images
     hangman_images = {
         3: "fartman_images/fartman_full.png",
         2: "fartman_images/fartman_2.png",
@@ -31,7 +30,7 @@ def show_fartman_image(tries, width=320):
     }
     image_path = hangman_images.get(tries)
     if image_path and os.path.exists(image_path):
-        st.image(image_path, use_column_width=False, width=width)
+        st.image(image_path, width=width, use_container_width=False)
     else:
         st.markdown(f"<div style='height:320px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;font-size:1.4em;'>[fartman image missing]</div>", unsafe_allow_html=True)
 
@@ -190,4 +189,4 @@ with col2:
     if os.path.exists(img_path):
         st.markdown("<div style='margin-top: 16px;'></div>", unsafe_allow_html=True)
         img = Image.open(img_path)
-        st.image(img.resize((200, 200)), caption=f"Hint for word", use_column_width=False)
+        st.image(img.resize((200, 200)), caption=f"Hint for word", use_container_width=False)
