@@ -185,6 +185,9 @@ with col1:
             "word_skipped": st.session_state.word_skipped,
             "guessed": st.session_state.guessed,
             "guessed_letters": st.session_state.guessed_letters,
+            from PIL import Image
+            img = Image.open("fartman_images/fartman_full.png")
+            img.show()
         })
 
 with col2:
