@@ -29,6 +29,7 @@ def show_fartman_image(tries, width=320):
         0: "fartman_images/fartman_0.png"
     }
     image_path = hangman_images.get(tries)
+    st.write(f"DEBUG: Image path for tries={tries}: {image_path}")  # <-- Add this for debugging
     if image_path and os.path.exists(image_path):
         st.image(image_path, width=width, use_container_width=False)
     else:
