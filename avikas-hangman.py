@@ -38,7 +38,7 @@ def show_fartman_image(tries, width=500):
         st.image(image_path, width=width, use_container_width=False)
     else:
         st.markdown(
-            f"<div style='height:320px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;font-size:1.4em;'>[fartman image missing]</div>", 
+            f"<div style='height:500px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;font-size:1.4em;'>[fartman image missing]</div>", 
             unsafe_allow_html=True
         )
 def play_sound(file):
@@ -116,7 +116,7 @@ col1, col2 = st.columns([2, 1], gap="large")
 with col1:
     flying_super_fartman("super_fartman.png")
     st.markdown(
-        "<h1 style='font-size: 30px; color: purple; text-align: left;'>Avika, Spell it right OR Fartman will get gassy! </h1>", 
+        "<h1 style='font-size: 30px; color: purple; text-align: left;'>AVIKA's \"Fartman\" Spelling Game! </h1>", 
         unsafe_allow_html=True
     )
     st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining Words**: {len(WORDS) - st.session_state.total_attempted}")
