@@ -22,7 +22,7 @@ def get_audio_bytes(word):
     tts.write_to_fp(fp)
     return fp.getvalue()
 
-def show_fartman_image(tries, width=320):
+def show_fartman_image(tries, width=1320):
     hangman_images = {
         3: "fartman_images/fartman_full.png",
         2: "fartman_images/fartman_2.png",
