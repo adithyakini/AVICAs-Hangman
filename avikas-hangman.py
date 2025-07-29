@@ -118,7 +118,7 @@ if os.path.exists(img_path):
     img = Image.open(img_path)
     st.image(img.resize((200, 200)))
 
-show_hangman_image(st.session_state.wrong_guesses)
+show_hangman_image(3 - st.session_state.wrong_guesses)
 
 if '_' not in st.session_state.guessed:
     play_sound("win.mp3")
