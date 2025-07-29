@@ -75,7 +75,7 @@ def flying_super_fartman(image_path):
                 }}
                 .flying-fartman-overlay img {{
                     position: absolute;
-                    top: 0;
+                    top: 10;
                     left: 100%;
                     height: 120px;
                     animation: fly-once 3s linear;
