@@ -22,7 +22,7 @@ def get_audio_bytes(word):
     tts.write_to_fp(fp)
     return fp.getvalue()
 
-def show_fartman_image(tries, width=500):
+def show_fartman_image(tries, width=300):
     hangman_images = {
         3: "fartman_images/fartman_full.png",
         2: "fartman_images/fartman_2.png",
@@ -202,11 +202,11 @@ with col1:
 with col2:
     st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
     #st.markdown("<h3 style='text-align:center;'>Fartman Status</h3>", unsafe_allow_html=True)
-    show_fartman_image(st.session_state.tries, width=500)
+    show_fartman_image(st.session_state.tries, width=300)
     # Show the word's image (if available)
     img_path = f"fartman_images/{st.session_state.word.lower()}.png"
     if os.path.exists(img_path):
         st.markdown("<div style='margin-top: 16px;'></div>", unsafe_allow_html=True)
         img = Image.open(img_path)
-        st.image(img.resize((500, 500)), caption=f"Hint for word", use_container_width=False)
+        st.image(img.resize((300, 300)), caption=f"Hint for word", use_container_width=False)
     
