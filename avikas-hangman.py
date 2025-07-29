@@ -188,7 +188,7 @@ with col1:
             "guessed_letters": st.session_state.guessed_letters,
         })
 
-img = Image.open("hangman_images_bkp/1.png")
+img = Image.open("hangman_images_BKP/1.png")
 img.show()
 
 with col2:
