@@ -66,7 +66,7 @@ def flying_super_fartman(image_path):
                 <style>
                 .flying-fartman-overlay {{
                     position: fixed;
-                    top: 50px;
+                    top: 150px;
                     right: 0;
                     width: 300px;
                     height: 140px;
