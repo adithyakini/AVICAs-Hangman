@@ -111,7 +111,7 @@ if 'initialized' not in st.session_state:
     st.session_state.initialized = True
 
 # Layout: two columns
-col1, col2 = st.columns([2, 1], gap="large")
+col1, col2 = st.columns([1.2, 1.8], gap="large")
 
 with col1:
     flying_super_fartman("super_fartman.png")
