@@ -6,6 +6,7 @@ from io import BytesIO
 from PIL import Image
 import base64
 import uuid
+from PIL import Image
 
 # Setup folders
 os.makedirs("fartman_images", exist_ok=True)
@@ -185,7 +186,7 @@ with col1:
             "word_skipped": st.session_state.word_skipped,
             "guessed": st.session_state.guessed,
             "guessed_letters": st.session_state.guessed_letters,
-            from PIL import Image
+            
             img = Image.open("fartman_images/fartman_full.png")
             img.show()
         })
