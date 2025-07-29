@@ -90,7 +90,10 @@ if 'word_index' not in st.session_state:
     st.session_state.guessed = ['_' for _ in st.session_state.word]
 
 # Main game UI
-st.title("🎉 Avika's SUPER FARTMAN spelling Game!")
+st.markdown(
+    "<h1 style='font-size: 50px; color: blue; text-align: center;'>FARTMAN Spelling Game for AVIKA</h1>", 
+    unsafe_allow_html=True
+)
 st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining Words**: {len(WORDS) - st.session_state.total_attempted}")
 
 if st.button("🔊 Hear Word"):
