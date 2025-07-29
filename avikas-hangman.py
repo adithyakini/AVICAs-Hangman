@@ -132,48 +132,45 @@ with col1:
         guess = st.text_input("Type a letter:", max_chars=1, value=st.session_state.guess_input, key="guess_box")
         submit = st.form_submit_button("Submit")
 
-# --- Guess Logic ---
-if submit and guess and guess.isalpha():
-    letter = guess.upper()
-    st.session_state.guess_input = ""
-    if letter in st.session_state.guessed or letter in st.session_state.guessed_letters:
-        st.warning("You already guessed that letter!")
-    elif letter in st.session_state.word:
-        play_sound("correct.mp3")
-        for i, l in enumerate(st.session_state.word):
-            if l == letter:
-                st.session_state.guessed[i] = letter
-    else:
-        st.session_state.guessed_letters.append(letter)
-        st.session_state.tries -= 1
-        st.session_state.wrong_guesses += 1
-        play_sound("wrongguess.mp3")
+    # --- Guess Logic ---
+    if submit and guess and guess.isalpha():
+        letter = guess.upper()
+        st.session_state.guess_input = ""
+        if letter in st.session_state.guessed or letter in st.session_state.guessed_letters:
+            st.warning("You already guessed that letter!")
+        elif letter in st.session_state.word:
+            play_sound("correct.mp3")
+            for i, l in enumerate(st.session_state.word):
+                if l == letter:
+                    st.session_state.guessed[i] = letter
+        else:
+            st.session_state.guessed_letters.append(letter)
+            st.session_state.tries -= 1
+            st.session_state.wrong_guesses += 1
+            play_sound("wrongguess.mp3")
 
-# Track if word is finished
-st.session_state.word_over = ('_' not in st.session_state.guessed or st.session_state.tries == 0)
+    st.header(' '.join(st.session_state.guessed))
 
-# Show progress
-st.header(' '.join(st.session_state.guessed))
+    if st.session_state.guessed_letters:
+        st.markdown("**Wrong guesses**: " + ', '.join(st.session_state.guessed_letters))
 
-if st.session_state.guessed_letters:
-    st.markdown("**Wrong guesses**: " + ', '.join(st.session_state.guessed_letters))
+    # --- Win/Lose Logic ---
+    if '_' not in st.session_state.guessed:
+        play_sound("win.mp3")
+        st.success(f"🎉 YAY! You spelt '{st.session_state.word}' correctly!")
+        if not st.session_state.word_guessed:
+            st.session_state.correct_count += 1
+            st.session_state.total_attempted += 1
+            st.session_state.word_guessed = True
 
-# --- Win/Lose Feedback (only once per word)
-if '_' not in st.session_state.guessed and not st.session_state.word_guessed:
-    play_sound("win.mp3")
-    st.success(f"🎉 YAY! You spelt '{st.session_state.word}' correctly!")
-    st.session_state.correct_count += 1
-    st.session_state.total_attempted += 1
-    st.session_state.word_guessed = True
+    elif st.session_state.tries == 0:
+        play_sound("lose.mp3")
+        st.error(f"Oops! The word was '{st.session_state.word}'")
+        if not st.session_state.word_skipped:
+            st.session_state.total_attempted += 1
+            st.session_state.word_skipped = True
 
-elif st.session_state.tries == 0 and not st.session_state.word_skipped:
-    play_sound("lose.mp3")
-    st.error(f"Oops! The word was '{st.session_state.word}'")
-    st.session_state.total_attempted += 1
-    st.session_state.word_skipped = True
-
-# --- Next Word / Game Progression
-if st.session_state.word_over:
+    # --- Next Word / Game Progression ---
     if st.session_state.total_attempted >= len(WORDS):
         st.success("🎉 You've completed all words! Let's play again!")
         if st.button("Restart Game"):
@@ -188,7 +185,6 @@ if st.session_state.word_over:
             if st.session_state.word_index % len(WORDS) == 0:
                 random.shuffle(WORDS)
             reset_word()
-
 
     progress = st.session_state.total_attempted / len(WORDS)
     st.progress(progress)
