@@ -104,6 +104,10 @@ with st.form(key="letter_form"):
     guess = st.text_input("Type a letter:", max_chars=1, value=st.session_state.guess_input, key="guess_box")
     submit = st.form_submit_button("Submit")
 
+# Add this flag to detect wrong guesses in the session state
+if 'play_fart_sound' not in st.session_state:
+    st.session_state.play_fart_sound = False
+
 if submit and guess and guess.isalpha():
     letter = guess.upper()
     st.session_state.guess_input = ""
@@ -114,11 +118,16 @@ if submit and guess and guess.isalpha():
                 st.session_state.guessed[i] = letter
     else:
         if letter not in st.session_state.guessed_letters:
-            play_sound("wrongguess.mp3")
             st.session_state.guessed_letters.append(letter)
             st.session_state.tries -= 1
             st.session_state.wrong_guesses += 1
+            st.session_state.play_fart_sound = True  # Set flag for sound
 
+# Play the fart sound if the flag is set
+if st.session_state.play_fart_sound:
+    play_sound("wrongguess.mp3")
+    st.session_state.play_fart_sound = False  # Reset flag
+    
 st.header(' '.join(st.session_state.guessed))
 
 if st.session_state.guessed_letters:
