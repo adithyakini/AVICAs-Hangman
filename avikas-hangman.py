@@ -208,5 +208,5 @@ with col2:
     if os.path.exists(img_path):
         st.markdown("<div style='margin-top: 16px;'></div>", unsafe_allow_html=True)
         img = Image.open(img_path)
-        st.image(img.resize((200, 200)), caption=f"Hint for word", use_container_width=False)
+        st.image(img.resize((1000, 1000)), caption=f"Hint for word", use_container_width=False)
     
