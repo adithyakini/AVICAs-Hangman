@@ -111,7 +111,10 @@ if 'initialized' not in st.session_state:
     st.session_state.initialized = True
 
 # Layout: two columns
-col1, col2 = st.columns([1.5, 1.5], gap="large")
+if st.session_state.get("is_mobile", False):
+    col1, col2 = st.columns([1, 1])
+else:
+    col1, col2 = st.columns([1.5, 1.5])
 
 with col1:
     flying_super_fartman("super_fartman.png")
@@ -208,5 +211,5 @@ with col2:
     if os.path.exists(img_path):
         st.markdown("<div style='margin-top: 16px;'></div>", unsafe_allow_html=True)
         img = Image.open(img_path)
-        st.image(img.resize((300, 300)), caption=f"Hint for word", use_container_width=False)
+        st.image(img, caption="Hint for word", use_container_width=True)
     
