@@ -19,12 +19,20 @@ def get_audio_bytes(word):
     tts.write_to_fp(fp)
     return fp.getvalue()
 
-def show_fartman_image(stage):
-    image_path = f"fartman_images/{stage}.png"
-    if os.path.exists(image_path):
+def show_hangman_image(tries):
+    # Map tries to corresponding hangman stage images
+    hangman_images = {
+        3: "fartman_images/fartman_full.png",  # Full health
+        2: "fartman_images/fartman_2.png",    # 2 tries left
+        1: "fartman_images/fartman_1.png",    # 1 try left
+        0: "fartman_images/fartman_lost.png"  # Game over
+    }
+    image_path = hangman_images.get(tries)
+    if image_path and os.path.exists(image_path):
         st.image(image_path, use_container_width=True)
     else:
-        st.text("[Missing Super Fartman image]")
+        st.text("[Hangman image missing]")
+        
 def play_sound(file):
     sound_path = f"sounds/{file}"
     if os.path.exists(sound_path):
