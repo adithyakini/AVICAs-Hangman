@@ -31,7 +31,7 @@ def show_hangman_image(tries):
     if image_path and os.path.exists(image_path):
         st.image(image_path, use_container_width=True)
     else:
-        st.text("[Hangman image missing]")
+        st.text("[fartman image missing]")
         
 def play_sound(file):
     sound_path = f"sounds/{file}"
