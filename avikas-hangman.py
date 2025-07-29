@@ -35,7 +35,7 @@ def show_fartman_image(tries, width=300):
     #st.write(f"DEBUG: Absolute path: {abs_path}")
     #st.write(f"DEBUG: os.path.exists: {os.path.exists(image_path)}")
     if image_path and os.path.exists(image_path):
-        st.image(image_path, width=width, use_container_width=False)
+        st.image(image_path, width=width, use_container_width=True)
     else:
         st.markdown(
             f"<div style='height:500px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;font-size:1.4em;'>[fartman image missing]</div>", 
