@@ -163,12 +163,11 @@ with col1:
             st.session_state.total_attempted += 1
             st.session_state.word_guessed = True
 
-    elif st.session_state.tries == 0:
+    elif st.session_state.tries == 0 and not st.session_state.word_skipped:
         play_sound("lose.mp3")
         st.error(f"Oops! The word was '{st.session_state.word}'")
-        if not st.session_state.word_skipped:
-            st.session_state.total_attempted += 1
-            st.session_state.word_skipped = True
+        st.session_state.total_attempted += 1
+        st.session_state.word_skipped = True
 
     # --- Next Word / Game Progression ---
     if st.session_state.total_attempted >= len(WORDS):
