@@ -12,8 +12,8 @@ os.makedirs("fartman_images", exist_ok=True)
 os.makedirs("sounds", exist_ok=True)
 
 WORDS = [
-    "apple", "banana", "grape", "family", "school",
-    "pencil", "friend", "yellow", "favourite", "spend"
+    "beautiful", "carefully", "everywhere", "soup", "friend",
+    "garden", "tongue", "terrace", "machine", "ground"
 ]
 
 def get_audio_bytes(word):
