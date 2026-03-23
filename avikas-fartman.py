@@ -5,7 +5,6 @@ from gtts import gTTS
 from io import BytesIO
 from PIL import Image
 import base64
-import uuid
 
 # Setup folders
 os.makedirs("fartman_images", exist_ok=True)
@@ -16,12 +15,15 @@ WORDS = [
     "garden", "tongue", "terrace", "machine", "ground"
 ]
 
+# ---------------- AUDIO ----------------
+@st.cache_data
 def get_audio_bytes(word):
     tts = gTTS(text=word, lang='en')
     fp = BytesIO()
     tts.write_to_fp(fp)
     return fp.getvalue()
 
+# ---------------- IMAGES ----------------
 def show_fartman_image(tries, width=200):
     hangman_images = {
         3: "fartman_images/fartman_full.png",
@@ -30,39 +32,34 @@ def show_fartman_image(tries, width=200):
         0: "fartman_images/fartman_0.png"
     }
     image_path = hangman_images.get(tries)
-    abs_path = os.path.abspath(image_path) if image_path else None
-    #st.write(f"DEBUG: Image path for tries={tries}: {image_path}")
-    #st.write(f"DEBUG: Absolute path: {abs_path}")
-    #st.write(f"DEBUG: os.path.exists: {os.path.exists(image_path)}")
+
     if image_path and os.path.exists(image_path):
         st.image(image_path, width=width, use_container_width=True)
     else:
         st.markdown(
-            f"<div style='height:200px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;font-size:1.4em;'>[fartman image missing]</div>", 
+            "<div style='height:200px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;'>[image missing]</div>",
             unsafe_allow_html=True
         )
+
+# ---------------- SOUND ----------------
 def play_sound(file):
     sound_path = f"sounds/{file}"
     if os.path.exists(sound_path):
         with open(sound_path, "rb") as f:
             data = f.read()
             b64 = base64.b64encode(data).decode()
-            md = f"""
-            <audio autoplay>
-                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-            </audio>
-            """
-            st.markdown(md, unsafe_allow_html=True)
+            st.markdown(f"""
+                <audio autoplay>
+                    <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+                </audio>
+            """, unsafe_allow_html=True)
 
+# ---------------- ANIMATION ----------------
 def flying_super_fartman(image_path):
-    import base64
-    import os
     if os.path.exists(image_path):
         with open(image_path, "rb") as f:
-            data = f.read()
-            b64 = base64.b64encode(data).decode()
-            st.markdown(
-                f"""
+            b64 = base64.b64encode(f.read()).decode()
+            st.markdown(f"""
                 <style>
                 .flying-fartman-overlay {{
                     position: fixed;
@@ -75,10 +72,9 @@ def flying_super_fartman(image_path):
                 }}
                 .flying-fartman-overlay img {{
                     position: absolute;
-                    top: 0;
                     left: 100%;
                     height: 220px;
-                    animation: fly-once 10s linear;
+                    animation: fly-once 8s linear;
                 }}
                 @keyframes fly-once {{
                     0% {{ left: 100%; }}
@@ -88,20 +84,20 @@ def flying_super_fartman(image_path):
                 <div class="flying-fartman-overlay">
                     <img src="data:image/png;base64,{b64}">
                 </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            """, unsafe_allow_html=True)
 
+# ---------------- RESET ----------------
 def reset_word():
     st.session_state.word = WORDS[st.session_state.word_index % len(WORDS)].upper()
     st.session_state.guessed = ['_' for _ in st.session_state.word]
     st.session_state.guessed_letters = []
     st.session_state.tries = 3
     st.session_state.wrong_guesses = 0
-    st.session_state.guess_input = ""
-    st.session_state.word_skipped = False
     st.session_state.word_guessed = False
+    st.session_state.word_skipped = False
+    st.session_state.guess_box = ""   # clear input
 
+# ---------------- INIT ----------------
 if 'initialized' not in st.session_state:
     st.session_state.word_index = 0
     st.session_state.correct_count = 0
@@ -110,60 +106,68 @@ if 'initialized' not in st.session_state:
     reset_word()
     st.session_state.initialized = True
 
-# Layout: two columns
-if st.session_state.get("is_mobile", False):
-    col1, col2 = st.columns([1, 1])
-else:
-    col1, col2 = st.columns([1.5, 1.5])
+# ---------------- LAYOUT ----------------
+col1, col2 = st.columns([1.5, 1.5])
 
 with col1:
     flying_super_fartman("super_fartman.png")
+
     st.markdown(
-        "<h1 style='font-size: 30px; color: purple; text-align: left;'>AVIKA's \"Fartman\" Spelling Game! </h1>", 
+        "<h1 style='color: purple;'>AVIKA's \"Fartman\" Spelling Game!</h1>",
         unsafe_allow_html=True
     )
-    st.markdown(f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted} | **Remaining Words**: {len(WORDS) - st.session_state.total_attempted}")
 
+    st.markdown(
+        f"**Score**: {st.session_state.correct_count}/{st.session_state.total_attempted}"
+    )
+
+    # 🔊 AUDIO
     if st.button("🔊 Hear Word"):
-        audio_bytes = get_audio_bytes(st.session_state.word)
-        st.audio(audio_bytes, format='audio/mp3')
+        st.audio(get_audio_bytes(st.session_state.word), format='audio/mp3')
 
-    with st.form(key="letter_form"):
-        guess = st.text_input("Type a letter:", max_chars=1, value=st.session_state.guess_input, key="guess_box")
+    # ---------------- INPUT FORM ----------------
+    with st.form(key="letter_form", clear_on_submit=True):
+        guess = st.text_input(
+            "Type letters (e.g. abc):",
+            key="guess_box",
+            placeholder="Enter letters"
+        )
         submit = st.form_submit_button("Submit")
 
-    # --- Guess Logic ---
-    if submit and guess and guess.isalpha():
-        letter = guess.upper()
-        st.session_state.guess_input = ""
-        if letter in st.session_state.guessed or letter in st.session_state.guessed_letters:
-            st.warning("You already guessed that letter!")
-        elif letter in st.session_state.word:
-            play_sound("correct.mp3")
-            for i, l in enumerate(st.session_state.word):
-                if l == letter:
-                    st.session_state.guessed[i] = letter
-        else:
-            st.session_state.guessed_letters.append(letter)
-            st.session_state.tries -= 1
-            st.session_state.wrong_guesses += 1
-            play_sound("wrongguess.mp3")
+    # ---------------- GUESS LOGIC ----------------
+    if submit and guess:
+        letters = [l.upper() for l in guess if l.isalpha()]
 
+        for letter in letters:
+            if letter in st.session_state.guessed_letters or letter in st.session_state.guessed:
+                continue
+
+            if letter in st.session_state.word:
+                play_sound("correct.mp3")
+                for i, l in enumerate(st.session_state.word):
+                    if l == letter:
+                        st.session_state.guessed[i] = letter
+            else:
+                st.session_state.guessed_letters.append(letter)
+                st.session_state.tries -= 1
+                st.session_state.wrong_guesses += 1
+                play_sound("wrongguess.mp3")
+
+    # ---------------- DISPLAY ----------------
     st.header(' '.join(st.session_state.guessed))
 
     if st.session_state.guessed_letters:
         st.markdown("**Wrong guesses**: " + ', '.join(st.session_state.guessed_letters))
-    # Check if current word is finished
+
+    # ---------------- WIN / LOSE ----------------
     word_finished = ('_' not in st.session_state.guessed) or (st.session_state.tries == 0)
-    
-    # --- Win/Lose Logic ---
-    if '_' not in st.session_state.guessed:
+
+    if '_' not in st.session_state.guessed and not st.session_state.word_guessed:
         play_sound("win.mp3")
-        st.success(f"🎉 YAY! You spelt '{st.session_state.word}' correctly!")
-        if not st.session_state.word_guessed:
-            st.session_state.correct_count += 1
-            st.session_state.total_attempted += 1
-            st.session_state.word_guessed = True
+        st.success(f"🎉 Correct! The word is '{st.session_state.word}'")
+        st.session_state.correct_count += 1
+        st.session_state.total_attempted += 1
+        st.session_state.word_guessed = True
 
     elif st.session_state.tries == 0 and not st.session_state.word_skipped:
         play_sound("lose.mp3")
@@ -171,9 +175,9 @@ with col1:
         st.session_state.total_attempted += 1
         st.session_state.word_skipped = True
 
-    # --- Next Word / Game Progression ---
+    # ---------------- NEXT WORD ----------------
     if st.session_state.total_attempted >= len(WORDS):
-        st.success("🎉 You've completed all words! Let's play again!")
+        st.success("🎉 Game complete!")
         if st.button("Restart Game"):
             st.session_state.word_index = 0
             st.session_state.correct_count = 0
@@ -184,34 +188,23 @@ with col1:
         if word_finished:
             if st.button("Next Word"):
                 st.session_state.word_index += 1
-                if st.session_state.word_index % len(WORDS) == 0:
-                    random.shuffle(WORDS)
                 reset_word()
 
-    progress = st.session_state.total_attempted / len(WORDS)
-    st.progress(progress)
+    st.progress(st.session_state.total_attempted / len(WORDS))
 
-    if st.checkbox("Show debug info"):
-        st.write({
-            "word_index": st.session_state.word_index,
-            "word": st.session_state.word,
-            "correct_count": st.session_state.correct_count,
-            "total_attempted": st.session_state.total_attempted,
-            "tries": st.session_state.tries,
-            "word_guessed": st.session_state.word_guessed,
-            "word_skipped": st.session_state.word_skipped,
-            "guessed": st.session_state.guessed,
-            "guessed_letters": st.session_state.guessed_letters,
-        })
+    # ---------------- AUTO-FOCUS ----------------
+    st.markdown("""
+    <script>
+    const input = window.parent.document.querySelector('input[data-testid="stTextInput"]');
+    if (input) { input.focus(); }
+    </script>
+    """, unsafe_allow_html=True)
 
+# ---------------- RIGHT PANEL ----------------
 with col2:
-    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
-    #st.markdown("<h3 style='text-align:center;'>Fartman Status</h3>", unsafe_allow_html=True)
     show_fartman_image(st.session_state.tries)
-    # Show the word's image (if available)
+
     img_path = f"fartman_images/{st.session_state.word.lower()}.png"
     if os.path.exists(img_path):
-        st.markdown("<div style='margin-top: 16px;'></div>", unsafe_allow_html=True)
         img = Image.open(img_path)
-        st.image(img, caption="Hint for word", use_container_width=True)
-    
+        st.image(img, caption="Hint", use_container_width=True)
