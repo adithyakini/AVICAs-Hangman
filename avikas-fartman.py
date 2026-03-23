@@ -6,7 +6,7 @@ from io import BytesIO
 from PIL import Image
 import base64
 
-# Setup folders
+# ---------------- SETUP ----------------
 os.makedirs("fartman_images", exist_ok=True)
 os.makedirs("sounds", exist_ok=True)
 
@@ -23,18 +23,18 @@ def get_audio_bytes(word):
     tts.write_to_fp(fp)
     return fp.getvalue()
 
-# ---------------- IMAGES ----------------
+# ---------------- IMAGE ----------------
 def show_fartman_image(tries, width=200):
-    hangman_images = {
+    images = {
         3: "fartman_images/fartman_full.png",
         2: "fartman_images/fartman_2.png",
         1: "fartman_images/fartman_1.png",
         0: "fartman_images/fartman_0.png"
     }
-    image_path = hangman_images.get(tries)
+    path = images.get(tries)
 
-    if image_path and os.path.exists(image_path):
-        st.image(image_path, width=width, use_container_width=True)
+    if path and os.path.exists(path):
+        st.image(path, width=width)
     else:
         st.markdown(
             "<div style='height:200px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;'>[image missing]</div>",
@@ -43,11 +43,10 @@ def show_fartman_image(tries, width=200):
 
 # ---------------- SOUND ----------------
 def play_sound(file):
-    sound_path = f"sounds/{file}"
-    if os.path.exists(sound_path):
-        with open(sound_path, "rb") as f:
-            data = f.read()
-            b64 = base64.b64encode(data).decode()
+    path = f"sounds/{file}"
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            b64 = base64.b64encode(f.read()).decode()
             st.markdown(f"""
                 <audio autoplay>
                     <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
@@ -95,10 +94,9 @@ def reset_word():
     st.session_state.wrong_guesses = 0
     st.session_state.word_guessed = False
     st.session_state.word_skipped = False
-    st.session_state.guess_box = ""   # clear input
 
 # ---------------- INIT ----------------
-if 'initialized' not in st.session_state:
+if "initialized" not in st.session_state:
     st.session_state.word_index = 0
     st.session_state.correct_count = 0
     st.session_state.total_attempted = 0
@@ -123,10 +121,10 @@ with col1:
 
     # 🔊 AUDIO
     if st.button("🔊 Hear Word"):
-        st.audio(get_audio_bytes(st.session_state.word), format='audio/mp3')
+        st.audio(get_audio_bytes(st.session_state.word), format="audio/mp3")
 
-    # ---------------- INPUT FORM ----------------
-    with st.form(key="letter_form", clear_on_submit=True):
+    # ---------------- INPUT ----------------
+    with st.form("letter_form", clear_on_submit=True):
         guess = st.text_input(
             "Type letters (e.g. abc):",
             key="guess_box",
@@ -159,9 +157,9 @@ with col1:
     if st.session_state.guessed_letters:
         st.markdown("**Wrong guesses**: " + ', '.join(st.session_state.guessed_letters))
 
-    # ---------------- WIN / LOSE ----------------
     word_finished = ('_' not in st.session_state.guessed) or (st.session_state.tries == 0)
 
+    # ---------------- WIN ----------------
     if '_' not in st.session_state.guessed and not st.session_state.word_guessed:
         play_sound("win.mp3")
         st.success(f"🎉 Correct! The word is '{st.session_state.word}'")
@@ -169,6 +167,7 @@ with col1:
         st.session_state.total_attempted += 1
         st.session_state.word_guessed = True
 
+    # ---------------- LOSE ----------------
     elif st.session_state.tries == 0 and not st.session_state.word_skipped:
         play_sound("lose.mp3")
         st.error(f"Oops! The word was '{st.session_state.word}'")
@@ -184,15 +183,17 @@ with col1:
             st.session_state.total_attempted = 0
             random.shuffle(WORDS)
             reset_word()
+            st.rerun()
     else:
         if word_finished:
             if st.button("Next Word"):
                 st.session_state.word_index += 1
                 reset_word()
+                st.rerun()   # ✅ CRITICAL FIX
 
     st.progress(st.session_state.total_attempted / len(WORDS))
 
-    # ---------------- AUTO-FOCUS ----------------
+    # ---------------- AUTO FOCUS ----------------
     st.markdown("""
     <script>
     const input = window.parent.document.querySelector('input[data-testid="stTextInput"]');
