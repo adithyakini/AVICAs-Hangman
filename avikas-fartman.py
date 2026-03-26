@@ -1,30 +1,63 @@
 import streamlit as st
 import os
 import random
-from gtts import gTTS
-from io import BytesIO
-from PIL import Image
 import base64
+from io import BytesIO
+from gtts import gTTS
+from openai import OpenAI
 
-# ---------------- SETUP ----------------
+# ---------------- CONFIG ----------------
+st.set_page_config(page_title="Fartman Spelling Game 💨", layout="centered")
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# ---------------- DIRECTORIES ----------------
 os.makedirs("fartman_images", exist_ok=True)
 os.makedirs("sounds", exist_ok=True)
 
-WORDS = [
-    "beautiful", "carefully", "everywhere", "soup", "friend",
-    "garden", "tongue", "terrace", "machine", "ground"
-]
+# ---------------- FALLBACK WORDS ----------------
+FALLBACK_WORDS = {
+    "Grade 1": ["cat", "dog", "sun", "hat", "pen", "cup"],
+    "Grade 2": ["apple", "table", "chair", "green", "smile"],
+    "Spell Bee": ["beautiful", "carefully", "machine", "tongue"]
+}
+
+LEVELS = {
+    "Grade 1": "very simple words for kids age 5-6",
+    "Grade 2": "slightly harder words for kids age 6-7",
+    "Spell Bee": "challenging spelling bee level words"
+}
+
+# ---------------- SESSION INIT ----------------
+def init_session():
+    defaults = {
+        "word": "",
+        "guessed": [],
+        "tries": 3,
+        "score": 0,
+        "used_words": [],
+        "cache_words": {},
+        "history": [],
+        "game_over": False,
+        "animation_played": False,
+        "level": "Grade 1"
+    }
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
+
+init_session()
 
 # ---------------- AUDIO ----------------
 @st.cache_data
 def get_audio_bytes(word):
-    tts = gTTS(text=word, lang='en')
+    tts = gTTS(text=f"Spell the word: {word}", lang='en')
     fp = BytesIO()
     tts.write_to_fp(fp)
     return fp.getvalue()
 
 # ---------------- IMAGE ----------------
-def show_fartman_image(tries, width=200):
+def show_fartman_image(tries):
     images = {
         3: "fartman_images/fartman_full.png",
         2: "fartman_images/fartman_2.png",
@@ -32,14 +65,10 @@ def show_fartman_image(tries, width=200):
         0: "fartman_images/fartman_0.png"
     }
     path = images.get(tries)
-
     if path and os.path.exists(path):
-        st.image(path, width=width)
+        st.image(path, width=200)
     else:
-        st.markdown(
-            "<div style='height:200px;border:2px dashed #aaa;display:flex;align-items:center;justify-content:center;'>[image missing]</div>",
-            unsafe_allow_html=True
-        )
+        st.write("💨")
 
 # ---------------- SOUND ----------------
 def play_sound(file):
@@ -49,26 +78,144 @@ def play_sound(file):
             b64 = base64.b64encode(f.read()).decode()
             st.markdown(f"""
                 <audio autoplay>
-                    <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+                <source src="data:audio/mp3;base64,{b64}">
                 </audio>
             """, unsafe_allow_html=True)
 
-# ---------------- ANIMATION ----------------
-def flying_super_fartman(image_path):
-    if os.path.exists(image_path):
-        with open(image_path, "rb") as f:
+# ---------------- FLYING ANIMATION ----------------
+def flying_super_fartman():
+    path = "fartman_images/fartman_full.png"
+    if os.path.exists(path):
+        with open(path, "rb") as f:
             b64 = base64.b64encode(f.read()).decode()
-            st.markdown(f"""
-                <style>
-                .flying-fartman-overlay {{
-                    position: fixed;
-                    top: 150px;
-                    right: 0;
-                    width: 1500px;
-                    height: 840px;
-                    pointer-events: none;
-                    z-index: 9999;
-                }}
+
+        st.markdown(f"""
+        <style>
+        @keyframes fly {{
+            0% {{ transform: translateX(100vw); }}
+            100% {{ transform: translateX(-120vw); }}
+        }}
+        .fly {{
+            position: fixed;
+            top: 200px;
+            z-index: 9999;
+            animation: fly 3s linear;
+        }}
+        </style>
+        <img src="data:image/png;base64,{b64}" class="fly">
+        """, unsafe_allow_html=True)
+
+# ---------------- AI WORD ----------------
+def get_ai_word(level):
+    # CACHE HIT
+    if level in st.session_state.cache_words and st.session_state.cache_words[level]:
+        return st.session_state.cache_words[level].pop()
+
+    try:
+        prompt = f"""
+        Give ONE spelling word for {level}.
+        Only return the word.
+        Avoid: {st.session_state.used_words}
+        """
+
+        res = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7
+        )
+
+        word = res.choices[0].message.content.strip().lower()
+
+        # store extra words in cache (pre-fetch trick)
+        st.session_state.cache_words.setdefault(level, []).append(word)
+
+        return word
+
+    except Exception:
+        # FALLBACK
+        return random.choice(FALLBACK_WORDS[level])
+
+# ---------------- ADAPTIVE LEVEL ----------------
+def adjust_level():
+    score = st.session_state.score
+    if score >= 5:
+        return "Spell Bee"
+    elif score >= 2:
+        return "Grade 2"
+    return "Grade 1"
+
+# ---------------- NEW WORD ----------------
+def new_word():
+    st.session_state.word = get_ai_word(st.session_state.level)
+    st.session_state.guessed = []
+    st.session_state.tries = 3
+    st.session_state.game_over = False
+    st.session_state.animation_played = False
+    st.session_state.used_words.append(st.session_state.word)
+
+# ---------------- INIT FIRST WORD ----------------
+if not st.session_state.word:
+    new_word()
+
+# ---------------- UI ----------------
+st.title("💨 Fartman Spelling Game")
+
+# Difficulty select
+selected_level = st.selectbox("Choose Level 🎯", list(LEVELS.keys()))
+st.session_state.level = selected_level
+
+# Stats
+st.metric("Score", st.session_state.score)
+st.progress(min(max(st.session_state.score / 10, 0), 1))
+
+# Show image
+show_fartman_image(st.session_state.tries)
+
+# Play audio
+audio_bytes = get_audio_bytes(st.session_state.word)
+st.audio(audio_bytes)
+
+# Display blanks
+display = " ".join([
+    letter if letter in st.session_state.guessed else "_"
+    for letter in st.session_state.word
+])
+st.subheader(display)
+
+# Input
+guess = st.text_input("Guess a letter", max_chars=1)
+
+if guess:
+    guess = guess.lower()
+
+    if guess not in st.session_state.guessed:
+        st.session_state.guessed.append(guess)
+
+        if guess not in st.session_state.word:
+            st.session_state.tries -= 1
+            play_sound("fart.mp3")
+
+# ---------------- GAME LOGIC ----------------
+if "_" not in display:
+    st.success("🎉 You Win!")
+    st.session_state.score += 1
+    st.session_state.game_over = True
+
+    if not st.session_state.animation_played:
+        flying_super_fartman()
+        st.session_state.animation_played = True
+
+elif st.session_state.tries <= 0:
+    st.error(f"💀 You lost! Word was: {st.session_state.word}")
+    st.session_state.score -= 1
+    st.session_state.game_over = True
+
+# ---------------- NEXT BUTTON ----------------
+if st.session_state.game_over:
+    if st.button("Next Word ➡️"):
+        st.session_state.level = adjust_level()
+        new_word()
+        st.rerun()                }}
                 .flying-fartman-overlay img {{
                     position: absolute;
                     left: 100%;
