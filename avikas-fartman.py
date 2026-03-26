@@ -215,7 +215,7 @@ if st.session_state.game_over:
     if st.button("Next Word ➡️"):
         st.session_state.level = adjust_level()
         new_word()
-        st.rerun()                }}
+        st.rerun()}}
                 .flying-fartman-overlay img {{
                     position: absolute;
                     left: 100%;
