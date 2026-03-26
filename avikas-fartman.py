@@ -11,7 +11,7 @@ st.set_page_config(page_title="Fartman Spelling Game 💨", layout="centered")
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# ---------------- DIRECTORIES ----------------
+# ---------------- SETUP ----------------
 os.makedirs("fartman_images", exist_ok=True)
 os.makedirs("sounds", exist_ok=True)
 
@@ -22,11 +22,7 @@ FALLBACK_WORDS = {
     "Spell Bee": ["beautiful", "carefully", "machine", "tongue"]
 }
 
-LEVELS = {
-    "Grade 1": "very simple words for kids age 5-6",
-    "Grade 2": "slightly harder words for kids age 6-7",
-    "Spell Bee": "challenging spelling bee level words"
-}
+LEVELS = ["Grade 1", "Grade 2", "Spell Bee"]
 
 # ---------------- SESSION INIT ----------------
 def init_session():
@@ -37,7 +33,6 @@ def init_session():
         "score": 0,
         "used_words": [],
         "cache_words": {},
-        "history": [],
         "game_over": False,
         "animation_played": False,
         "level": "Grade 1"
@@ -51,7 +46,7 @@ init_session()
 # ---------------- AUDIO ----------------
 @st.cache_data
 def get_audio_bytes(word):
-    tts = gTTS(text=f"Spell the word: {word}", lang='en')
+    tts = gTTS(text="Spell the word: " + word, lang='en')
     fp = BytesIO()
     tts.write_to_fp(fp)
     return fp.getvalue()
@@ -72,15 +67,16 @@ def show_fartman_image(tries):
 
 # ---------------- SOUND ----------------
 def play_sound(file):
-    path = f"sounds/{file}"
+    path = "sounds/" + file
     if os.path.exists(path):
         with open(path, "rb") as f:
             b64 = base64.b64encode(f.read()).decode()
-            st.markdown(f"""
-                <audio autoplay>
-                <source src="data:audio/mp3;base64,{b64}">
-                </audio>
-            """, unsafe_allow_html=True)
+            audio_html = """
+            <audio autoplay>
+                <source src="data:audio/mp3;base64,""" + b64 + """" type="audio/mp3">
+            </audio>
+            """
+            st.markdown(audio_html, unsafe_allow_html=True)
 
 # ---------------- FLYING ANIMATION ----------------
 def flying_super_fartman():
@@ -89,50 +85,50 @@ def flying_super_fartman():
         with open(path, "rb") as f:
             b64 = base64.b64encode(f.read()).decode()
 
-        st.markdown(f"""
+        html = """
         <style>
-        @keyframes fly {{
-            0% {{ transform: translateX(100vw); }}
-            100% {{ transform: translateX(-120vw); }}
-        }}
-        .fly {{
+        @keyframes fly {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-120vw); }
+        }
+        .fly {
             position: fixed;
             top: 200px;
             z-index: 9999;
             animation: fly 3s linear;
-        }}
+        }
         </style>
-        <img src="data:image/png;base64,{b64}" class="fly">
-        """, unsafe_allow_html=True)
+        """
+
+        img = '<img src="data:image/png;base64,' + b64 + '" class="fly">'
+
+        st.markdown(html + img, unsafe_allow_html=True)
 
 # ---------------- AI WORD ----------------
 def get_ai_word(level):
-    # CACHE HIT
-    if level in st.session_state.cache_words and st.session_state.cache_words[level]:
+    # Check cache first
+    if level in st.session_state.cache_words and len(st.session_state.cache_words[level]) > 0:
         return st.session_state.cache_words[level].pop()
 
     try:
-        prompt = f"""
-        Give ONE spelling word for {level}.
-        Only return the word.
-        Avoid: {st.session_state.used_words}
-        """
+        prompt = "Give one spelling word for " + level + ". Only return the word."
 
-        res = client.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-4.1-mini",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
         )
 
-        word = res.choices[0].message.content.strip().lower()
+        word = response.choices[0].message.content.strip().lower()
 
-        # store extra words in cache (pre-fetch trick)
-        st.session_state.cache_words.setdefault(level, []).append(word)
+        # store in cache
+        if level not in st.session_state.cache_words:
+            st.session_state.cache_words[level] = []
+        st.session_state.cache_words[level].append(word)
 
         return word
 
     except Exception:
-        # FALLBACK
         return random.choice(FALLBACK_WORDS[level])
 
 # ---------------- ADAPTIVE LEVEL ----------------
@@ -142,47 +138,46 @@ def adjust_level():
         return "Spell Bee"
     elif score >= 2:
         return "Grade 2"
-    return "Grade 1"
+    else:
+        return "Grade 1"
 
 # ---------------- NEW WORD ----------------
 def new_word():
-    st.session_state.word = get_ai_word(st.session_state.level)
+    word = get_ai_word(st.session_state.level)
+    st.session_state.word = word
     st.session_state.guessed = []
     st.session_state.tries = 3
     st.session_state.game_over = False
     st.session_state.animation_played = False
-    st.session_state.used_words.append(st.session_state.word)
+    st.session_state.used_words.append(word)
 
-# ---------------- INIT FIRST WORD ----------------
-if not st.session_state.word:
+# ---------------- FIRST LOAD ----------------
+if st.session_state.word == "":
     new_word()
 
 # ---------------- UI ----------------
 st.title("💨 Fartman Spelling Game")
 
-# Difficulty select
-selected_level = st.selectbox("Choose Level 🎯", list(LEVELS.keys()))
+selected_level = st.selectbox("Choose Difficulty 🎯", LEVELS)
 st.session_state.level = selected_level
 
-# Stats
 st.metric("Score", st.session_state.score)
-st.progress(min(max(st.session_state.score / 10, 0), 1))
+st.progress(min(max(st.session_state.score / 10.0, 0), 1))
 
-# Show image
 show_fartman_image(st.session_state.tries)
 
-# Play audio
 audio_bytes = get_audio_bytes(st.session_state.word)
 st.audio(audio_bytes)
 
-# Display blanks
-display = " ".join([
-    letter if letter in st.session_state.guessed else "_"
-    for letter in st.session_state.word
-])
-st.subheader(display)
+display = ""
+for letter in st.session_state.word:
+    if letter in st.session_state.guessed:
+        display += letter + " "
+    else:
+        display += "_ "
 
-# Input
+st.subheader(display.strip())
+
 guess = st.text_input("Guess a letter", max_chars=1)
 
 if guess:
@@ -206,53 +201,16 @@ if "_" not in display:
         st.session_state.animation_played = True
 
 elif st.session_state.tries <= 0:
-    st.error(f"💀 You lost! Word was: {st.session_state.word}")
+    st.error("💀 You lost! Word was: " + st.session_state.word)
     st.session_state.score -= 1
     st.session_state.game_over = True
 
-# ---------------- NEXT BUTTON ----------------
+# ---------------- NEXT WORD ----------------
 if st.session_state.game_over:
     if st.button("Next Word ➡️"):
         st.session_state.level = adjust_level()
         new_word()
-        st.rerun()
-                .flying-fartman-overlay img {{
-                    position: absolute;
-                    left: 100%;
-                    height: 220px;
-                    animation: fly-once 8s linear;
-                }}
-                @keyframes fly-once {{
-                    0% {{ left: 100%; }}
-                    100% {{ left: -300px; }}
-                }}
-                </style>
-                <div class="flying-fartman-overlay">
-                    <img src="data:image/png;base64,{b64}">
-                </div>
-            """, unsafe_allow_html=True)
-
-# ---------------- RESET ----------------
-def reset_word():
-    st.session_state.word = WORDS[st.session_state.word_index % len(WORDS)].upper()
-    st.session_state.guessed = ['_' for _ in st.session_state.word]
-    st.session_state.guessed_letters = []
-    st.session_state.tries = 3
-    st.session_state.wrong_guesses = 0
-    st.session_state.word_guessed = False
-    st.session_state.word_skipped = False
-
-# ---------------- INIT ----------------
-if "initialized" not in st.session_state:
-    st.session_state.word_index = 0
-    st.session_state.correct_count = 0
-    st.session_state.total_attempted = 0
-    random.shuffle(WORDS)
-    reset_word()
-    st.session_state.initialized = True
-
-# ---------------- LAYOUT ----------------
-col1, col2 = st.columns([1.5, 1.5])
+        st.rerun()col1, col2 = st.columns([1.5, 1.5])
 
 with col1:
     flying_super_fartman("super_fartman.png")
